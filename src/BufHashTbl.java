@@ -20,15 +20,27 @@ public class BufHashTbl {
 
     public int lookup(int pageNum) {
         // your code goes here
-        if (this.records.contains(pageNum)) {
-            return this.records.get(pageNum).get(pageNum).frameNum;
+        for (int i = 0; i < tableSize; i++) {
+            for (int j = 0; i < this.records.get(i).size(); j++) {
+                if (records.get(i).get(j).pageNum == pageNum) {
+                    return records.get(i).get(j).frameNum;
+                }
+            }
         }
-        return 0;  // you need to change the returned value
+        return -1;  // you need to change the returned value
     }
 
     public boolean remove(int pageNum, int frameNum) {
         // your code goes here
-        return true; // you need to change the returned value
+        for (int i = 0; i < this.tableSize; i++) {
+            for (int j = 0; j < this.records.get(i).size(); j++) {
+                if (this.records.get(i).get(j).pageNum == pageNum && this.records.get(i).get(j).frameNum == frameNum) {
+                    this.records.get(i).remove(j);
+                    return true; // you need to change the returned value
+                }
+            }
+        }
+        return false;
     }
 
     private static class BufTblRecord {

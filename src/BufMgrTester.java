@@ -2,11 +2,12 @@ import java.util.Scanner;
 
 public class BufMgrTester {
     public static void main(String[] args) {
-        if (args == null || args.length == 0) {
+/*        if (args == null || args.length == 0) {
             System.out.println("please specify buffer size");
             return;
-        }
-        BufMgr bufMgr = new BufMgr(Integer.parseInt(args[0]));
+        }*/
+        //BufMgr bufMgr = new BufMgr(Integer.parseInt(args[0]));
+        BufMgr bufMgr = new BufMgr(4);
         Scanner s = new Scanner(System.in);
         int inChoice = 0;
 

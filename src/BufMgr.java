@@ -1,5 +1,4 @@
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -20,21 +19,40 @@ public class BufMgr {
     }
 
     public void pin(int pageNum) {
-       if (this.pool[pageNum] != null) {
-           this.pool[pageNum].incPin();
+        int frameNum = bufTbl.lookup(pageNum);
+        if (frameNum != -1) {
+            pool[frameNum].incPin();
+            lruQueue.add(frameNum);
+        } else {
+            frameNum = getFreeFrame();
+            if (frameNum == -1) {
+                frameNum = lruQueue.get(0);
+            }
 
-       } else {
+            if (this.pool[frameNum].isDirty()) {
+                writePage(pageNum);
+            }
 
-       }
+            readPage(frameNum);
+            this.pool[frameNum].incPin();
+            this.pool[frameNum].setDirty(false);
 
+        }
+    }
 
+    public int getFreeFrame() {
+        for (int i = 0; i < this.poolSize; i++) {
+            if (this.pool[i].getPin() == 0) {
+                return i;
+            }
+        }
+
+        return -1;
     }
 
     public void unpin(int pageNum) {
         this.pool[pageNum].decPin();
-        if (!this.pool[pageNum].isDirty()) {
-            this.pool[pageNum].setDirty(true);
-        }
+
     }
 
     public void createPage(int pageNum) {
@@ -53,11 +71,40 @@ public class BufMgr {
     }
 
     public void readPage(int pageNum) {
-        // your code goes here
+        String path = getPageFileName(pageNum);
+        StringBuilder contentBuilder = new StringBuilder();
+
+        try {
+
+            BufferedReader br = new BufferedReader(new FileReader(path));
+
+            String line;
+            while ((line = br.readLine()) != null) {
+                contentBuilder.append(line);
+            }
+            br.close();
+        } catch (IOException e ) {
+            e.printStackTrace();
+        }
+
+        Integer frameNumber = bufTbl.lookup(pageNum);
+        pool[frameNumber].setContent(contentBuilder.toString());
+
     }
 
     public void writePage(int pageNum) {
-        // your code goes here
+        Integer frameNum = bufTbl.lookup(pageNum);
+        String path = getPageFileName(pageNum);
+        String frameContent = pool[frameNum].getContent();
+
+        try {
+            FileOutputStream stream = new FileOutputStream(path);
+            stream.write(frameContent.getBytes());
+            stream.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 
     public void displayPage(int pageNum) {
