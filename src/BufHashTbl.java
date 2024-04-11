@@ -21,7 +21,7 @@ public class BufHashTbl {
     public int lookup(int pageNum) {
         // your code goes here
         for (int i = 0; i < tableSize; i++) {
-            for (int j = 0; i < this.records.get(i).size(); j++) {
+            for (int j = 0; j < this.records.get(i).size(); j++) {
                 if (records.get(i).get(j).pageNum == pageNum) {
                     return records.get(i).get(j).frameNum;
                 }
