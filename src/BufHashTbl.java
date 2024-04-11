@@ -20,10 +20,10 @@ public class BufHashTbl {
 
     public int lookup(int pageNum) {
         // your code goes here
-        for (int i = 0; i < tableSize; i++) {
+        for (int i = 0; i < this.tableSize; i++) {
             for (int j = 0; j < this.records.get(i).size(); j++) {
-                if (records.get(i).get(j).pageNum == pageNum) {
-                    return records.get(i).get(j).frameNum;
+                if (this.records.get(i).get(j).pageNum == pageNum) {
+                    return this.records.get(i).get(j).frameNum;
                 }
             }
         }
@@ -46,7 +46,6 @@ public class BufHashTbl {
     private static class BufTblRecord {
         public int pageNum;
         public int frameNum;
-
         public BufTblRecord (int pageNum, int frameNum) {
             this.pageNum = pageNum;
             this.frameNum = frameNum;

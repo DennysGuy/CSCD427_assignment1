@@ -22,37 +22,34 @@ public class BufMgr {
         }
 
     }
-
     public void pin(int pageNum) {
         int frameNum = bufTbl.lookup(pageNum);
         if (frameNum != -1) {
             pool[frameNum].incPin();
-            lruQueue.add(frameNum); // Update LRU queue since this frame was accessed
         } else {
             frameNum = getFreeFrame();
 
-            if (frameNum == -1) {
+            if (frameNum == -1) { //implement replacement policy
                 if (lruQueue.isEmpty()) {
                     System.out.println("No free frame available and LRU queue is empty.");
                     return; // No free frame and LRU queue is empty, can't continue
                 }
-                frameNum = lruQueue.remove(0); // Evict least recently used frame from LRU queue
-                if (pool[frameNum].isDirty()) {
-                    writePage(frameNum); // Write the evicted frame back to disk if dirty
+
+                frameNum = lruQueue.remove(0);
+                if (this.pool[frameNum].isDirty()) {
+                    writePage(frameNum);
                 }
             }
 
             readPage(pageNum);
-            pool[frameNum].incPin();
-            pool[frameNum].setDirty(false);
-            lruQueue.add(frameNum);
-
+            this.pool[frameNum].incPin();
         }
-    }
+        updateQueue(frameNum);
 
+    }
     public int getFreeFrame() {
         for (int i = 0; i < this.poolSize; i++) {
-            if (this.pool[i] != null && this.pool[i].getPin() == 0) {
+            if (this.pool[i].getPin() == 0) {
                 return i;
             }
         }
@@ -61,8 +58,22 @@ public class BufMgr {
     }
 
     public void unpin(int pageNum) {
-        this.pool[pageNum].decPin();
+        int frameNum = bufTbl.lookup(pageNum);
+        if (this.pool[frameNum].getPin() > 0)
+            this.pool[pageNum].decPin();
 
+        if (this.pool[frameNum].getPin() == 0 && this.pool[frameNum].isDirty()) {
+                writePage(pageNum);
+                bufTbl.remove(pageNum, frameNum);
+            }
+
+        this.updateQueue(frameNum);
+    }
+
+    public void updateQueue(int frameNum) {
+        if (this.lruQueue.contains(frameNum))
+            this.lruQueue.remove(Integer.valueOf(frameNum));
+        this.lruQueue.add(frameNum);
     }
 
     public void createPage(int pageNum) {
@@ -107,8 +118,9 @@ public class BufMgr {
             }
         }
 
-        if (frameNum != -1)
+        if (frameNum != -1) {
             this.bufTbl.insert(pageNum, frameNum);
+        }
         else
             System.out.println("no free frame available in the buffer pool");
     }
