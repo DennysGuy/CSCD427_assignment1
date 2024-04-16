@@ -42,12 +42,13 @@ public class BufMgr {
 
             }
 
-            //this will take in an empty frame, otherwise it should take the Least recently used fram in the LRU queue
+            //this will take in an empty frame, otherwise it should take the Least recently used frame in the LRU queue
             readPage(pageNum,frameNum);
             System.out.println("page " + pageNum + " which is stored in frame " + frameNum + " pin count: " + this.pool[frameNum].getPin() + " which is "  + ((this.pool[frameNum].isDirty()) ?  "dirty" :  "is not dirty"));
 
         }
         this.updateQueue(frameNum);
+        System.out.println("frame pool: " + displayFramePool());
         System.out.println(this.lruQueue);
 
     }
@@ -60,6 +61,14 @@ public class BufMgr {
         }
 
         return -1;
+    }
+
+    public ArrayList<Integer> displayFramePool() {
+        ArrayList<Integer> framePool = new ArrayList<>();
+        for (Frame frame : pool) {
+            framePool.add(frame.getPageNum());
+        }
+        return framePool;
     }
 
     public int getFreeFrame() {
@@ -78,6 +87,7 @@ public class BufMgr {
             this.pool[frameNum].decPin();
             this.updateQueue(frameNum);
         }
+        System.out.println("frame pool: " + displayFramePool());
         System.out.println(this.lruQueue);
         System.out.println("page " + pageNum + " which is stored in frame " + frameNum + " pin count: " + this.pool[frameNum].getPin() + " which is "  + ((this.pool[frameNum].isDirty()) ?  "dirty" :  "is not dirty"));
 
