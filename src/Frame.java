@@ -2,14 +2,28 @@ public class Frame {
     private int pinCount = 0;
     private boolean dirty = false;
     private String content;
+    private int pageNum;
 
     public Frame(String content) {
         this.content = content;
     }
 
+
+    public void setPageNum(int pageNum) {
+        this.pageNum = pageNum;
+    }
+
+    public void setPinCount(int pinCount) {
+        this.pinCount = pinCount;
+    }
+
     public int getPin() {
         // your code goes here
         return this.pinCount;
+    }
+
+    public int getPageNum() {
+        return this.pageNum;
     }
 
     public void incPin() {

@@ -26,27 +26,40 @@ public class BufMgr {
         int frameNum = bufTbl.lookup(pageNum);
         if (frameNum != -1) {
             pool[frameNum].incPin();
+            System.out.println("page " + pageNum + " which is stored in frame " + frameNum + " pin count: " + this.pool[frameNum].getPin() + " which is "  + ((this.pool[frameNum].isDirty()) ?  "dirty" :  "is not dirty"));
         } else {
-            frameNum = getFreeFrame();
+            frameNum = this.getEmptyFrame();
 
             if (frameNum == -1) { //implement replacement policy
-                if (lruQueue.isEmpty()) {
-                    System.out.println("No free frame available and LRU queue is empty.");
-                    return; // No free frame and LRU queue is empty, can't continue
-                }
 
                 frameNum = lruQueue.remove(0);
                 if (this.pool[frameNum].isDirty()) {
-                    writePage(frameNum);
+                    writePage(this.pool[frameNum].getPageNum());
+                    this.pool[frameNum].setDirty(false);
                 }
+                
+                this.bufTbl.remove(this.pool[frameNum].getPageNum(),frameNum);
+
             }
 
-            readPage(pageNum);
-            this.pool[frameNum].incPin();
+            //this will take in an empty frame, otherwise it should take the Least recently used fram in the LRU queue
+            readPage(pageNum,frameNum);
+            System.out.println("page " + pageNum + " which is stored in frame " + frameNum + " pin count: " + this.pool[frameNum].getPin() + " which is "  + ((this.pool[frameNum].isDirty()) ?  "dirty" :  "is not dirty"));
+
         }
-        updateQueue(frameNum);
 
     }
+
+    public int getEmptyFrame() {
+        for (int i = 0; i < this.poolSize; i++) {
+            if (this.pool[i].getContent() == null) {
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
     public int getFreeFrame() {
         for (int i = 0; i < this.poolSize; i++) {
             if (this.pool[i].getPin() == 0) {
@@ -59,15 +72,17 @@ public class BufMgr {
 
     public void unpin(int pageNum) {
         int frameNum = bufTbl.lookup(pageNum);
-        if (this.pool[frameNum].getPin() > 0)
-            this.pool[pageNum].decPin();
+        if (this.pool[frameNum].getPin() == 0) {
+            if (this.pool[frameNum].isDirty())
+                this.pool[frameNum].setDirty(false);
+        }
+        else {
+            this.pool[frameNum].decPin();
+        }
 
-        if (this.pool[frameNum].getPin() == 0 && this.pool[frameNum].isDirty()) {
-                writePage(pageNum);
-                bufTbl.remove(pageNum, frameNum);
-            }
+        System.out.println("page " + pageNum + " which is stored in frame " + frameNum + " pin count: " + this.pool[frameNum].getPin() + " which is "  + ((this.pool[frameNum].isDirty()) ?  "dirty" :  "is not dirty"));
 
-        this.updateQueue(frameNum);
+
     }
 
     public void updateQueue(int frameNum) {
@@ -91,7 +106,7 @@ public class BufMgr {
         }
     }
 
-    public void readPage(int pageNum) {
+    public void readPage(int pageNum, int frameNum) {
         String path = getPageFileName(pageNum);
         StringBuilder contentBuilder = new StringBuilder();
 
@@ -109,20 +124,14 @@ public class BufMgr {
         }
 
         Frame newFrame = new Frame(contentBuilder.toString());
-        int frameNum = -1;
-        for (int i = 0; i < poolSize; i++) {
-            if (pool[i].getPin() == 0) {
-                pool[i] = newFrame;
-                frameNum = i;
-                break;
-            }
-        }
+        newFrame.setPageNum(pageNum);
 
-        if (frameNum != -1) {
-            this.bufTbl.insert(pageNum, frameNum);
-        }
-        else
-            System.out.println("no free frame available in the buffer pool");
+        this.pool[frameNum] = newFrame;
+        this.pool[frameNum].incPin();
+        this.bufTbl.insert(pageNum, frameNum);
+        this.updateQueue(frameNum);
+
+
     }
 
     public void writePage(int pageNum) {
@@ -132,6 +141,8 @@ public class BufMgr {
 
         try {
             FileOutputStream stream = new FileOutputStream(path);
+            System.out.println("I have written to disk");
+            this.updateQueue(frameNum);
             stream.write(frameContent.getBytes());
             stream.close();
         } catch (IOException e) {
@@ -150,7 +161,6 @@ public class BufMgr {
     public void updatePage(int pageNum, String toAppend) {
         Integer frameNum = bufTbl.lookup(pageNum);
         if (frameNum == null) throw new IllegalArgumentException("Cannot update page that is not in memory");
-
         pool[frameNum].updatePage(toAppend);
     }
 

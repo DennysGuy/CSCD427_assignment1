@@ -20,7 +20,7 @@ public class BufHashTbl {
 
     public int lookup(int pageNum) {
         // your code goes here
-        for (int i = 0; i < this.tableSize; i++) {
+       for (int i = 0; i < this.tableSize; i++) {
             for (int j = 0; j < this.records.get(i).size(); j++) {
                 if (this.records.get(i).get(j).pageNum == pageNum) {
                     return this.records.get(i).get(j).frameNum;
@@ -29,6 +29,8 @@ public class BufHashTbl {
         }
         return -1;  // you need to change the returned value
     }
+
+
 
     public boolean remove(int pageNum, int frameNum) {
         // your code goes here
