@@ -32,12 +32,13 @@ public class BufMgr {
 
             if (frameNum == -1) { //implement replacement policy
 
-                frameNum = lruQueue.remove(0);
+                frameNum = lruReplacement();
                 if (this.pool[frameNum].isDirty()) {
                     writePage(this.pool[frameNum].getPageNum());
                     this.pool[frameNum].setDirty(false);
                 }
-
+                this.pool[frameNum].setContent(null);
+                frameNum = this.getEmptyFrame();
                 this.bufTbl.remove(this.pool[frameNum].getPageNum(),frameNum);
 
             }
@@ -49,8 +50,20 @@ public class BufMgr {
         }
         this.updateQueue(frameNum);
         System.out.println("frame pool: " + displayFramePool());
-        System.out.println(this.lruQueue);
+        System.out.println("lru queue: " + this.lruQueue);
 
+    }
+
+    public int lruReplacement() {
+
+        int lru = 0;
+        for (int i = 0; i < lruQueue.size(); i++) {
+            if (this.pool[lruQueue.get(i)].getPin() == 0) {
+                lru = lruQueue.get(i);
+                break;
+            }
+        }
+        return lru;
     }
 
     public int getEmptyFrame() {
@@ -88,7 +101,7 @@ public class BufMgr {
             this.updateQueue(frameNum);
         }
         System.out.println("frame pool: " + displayFramePool());
-        System.out.println(this.lruQueue);
+        System.out.println("lru queue: " + this.lruQueue);
         System.out.println("page " + pageNum + " which is stored in frame " + frameNum + " pin count: " + this.pool[frameNum].getPin() + " which is "  + ((this.pool[frameNum].isDirty()) ?  "dirty" :  "is not dirty"));
 
 
