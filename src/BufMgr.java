@@ -37,7 +37,7 @@ public class BufMgr {
                     writePage(this.pool[frameNum].getPageNum());
                     this.pool[frameNum].setDirty(false);
                 }
-                
+
                 this.bufTbl.remove(this.pool[frameNum].getPageNum(),frameNum);
 
             }
@@ -47,6 +47,8 @@ public class BufMgr {
             System.out.println("page " + pageNum + " which is stored in frame " + frameNum + " pin count: " + this.pool[frameNum].getPin() + " which is "  + ((this.pool[frameNum].isDirty()) ?  "dirty" :  "is not dirty"));
 
         }
+        this.updateQueue(frameNum);
+        System.out.println(this.lruQueue);
 
     }
 
@@ -72,14 +74,11 @@ public class BufMgr {
 
     public void unpin(int pageNum) {
         int frameNum = bufTbl.lookup(pageNum);
-        if (this.pool[frameNum].getPin() == 0) {
-            if (this.pool[frameNum].isDirty())
-                this.pool[frameNum].setDirty(false);
-        }
-        else {
+        if (frameNum != -1) {
             this.pool[frameNum].decPin();
+            this.updateQueue(frameNum);
         }
-
+        System.out.println(this.lruQueue);
         System.out.println("page " + pageNum + " which is stored in frame " + frameNum + " pin count: " + this.pool[frameNum].getPin() + " which is "  + ((this.pool[frameNum].isDirty()) ?  "dirty" :  "is not dirty"));
 
 
@@ -129,7 +128,6 @@ public class BufMgr {
         this.pool[frameNum] = newFrame;
         this.pool[frameNum].incPin();
         this.bufTbl.insert(pageNum, frameNum);
-        this.updateQueue(frameNum);
 
 
     }
@@ -142,7 +140,6 @@ public class BufMgr {
         try {
             FileOutputStream stream = new FileOutputStream(path);
             System.out.println("I have written to disk");
-            this.updateQueue(frameNum);
             stream.write(frameContent.getBytes());
             stream.close();
         } catch (IOException e) {

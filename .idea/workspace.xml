@@ -7,9 +7,7 @@
     <list default="true" id="dae50f6d-df45-4879-b7f9-1473daef1f37" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/3.txt" beforeDir="false" afterPath="$PROJECT_DIR$/3.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/BufHashTbl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/BufHashTbl.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/BufMgr.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/BufMgr.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Frame.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Frame.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -54,7 +52,7 @@
       <updated>1712795504521</updated>
       <workItem from="1712795505584" duration="13877000" />
       <workItem from="1712858190498" duration="5342000" />
-      <workItem from="1713227992297" duration="15047000" />
+      <workItem from="1713227992297" duration="16332000" />
     </task>
     <servers />
   </component>
@@ -66,12 +64,12 @@
       <breakpoints>
         <line-breakpoint enabled="true" type="java-method">
           <url>file://$PROJECT_DIR$/src/BufMgr.java</url>
-          <line>24</line>
-          <properties class="BufMgr" method="pin">
+          <line>74</line>
+          <properties class="BufMgr" method="unpin">
             <option name="EMULATED" value="true" />
             <option name="WATCH_EXIT" value="false" />
           </properties>
-          <option name="timeStamp" value="9" />
+          <option name="timeStamp" value="11" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
